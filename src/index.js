@@ -34,12 +34,32 @@ class ShoppingList extends React.Component {
         super(props);
         this.state = {
             priceTotal: 0,
-            cart: [],
+            cart: {
+                'Star Wars Episode IV: DVD' : null,
+                'Star Wars Episode V: DVD' : null,
+                'Star Wars Episode VI: DVD' : null,
+                'Star Wars Episode IV: Blu-Ray' : null,
+                'Star Wars Episode V: Blu-Ray' : null,
+                'Star Wars Episode VI: Blu-Ray' : null
+            },
+            allItems: {
+                'Star Wars Episode IV: DVD' : 0,
+                'Star Wars Episode V: DVD' : 0,
+                'Star Wars Episode VI: DVD' : 0,
+                'Star Wars Episode IV: Blu-Ray' : 0,
+                'Star Wars Episode V: Blu-Ray' : 0,
+                'Star Wars Episode VI: Blu-Ray' : 0
+            }
         };
     }
 
     addCart(name, price){
-        this.state.cart.push(<CartItem value={name} quantity={"1"} onClick={() => this.handleRemoveClick(name, price)}/>);
+        this.state.allItems[name] += 1;
+        this.state.cart[name] = <CartItem
+            value={name}
+            quantity={this.state.allItems[name]}
+            onClick={() => this.handleRemoveClick(name, price)}
+        />
     }
 
     handleRemoveClick(name, price){
@@ -69,16 +89,16 @@ class ShoppingList extends React.Component {
     }
 
     renderCart(price) {
-        if (this.state.cart.length > 0) {
-            return (
-                this.state.cart
-            )
+        var currentCart = [];
+        for (var key in this.state.cart) {
+            var tempItem = this.state.cart[key];
+            if (tempItem){
+                currentCart.push(tempItem);
+            }
         }
-        else {
-            return (
-                <div>{"No Items In Cart"}</div>
-            )
-        }
+        return (
+            currentCart
+        )
     }
 
     render() {
