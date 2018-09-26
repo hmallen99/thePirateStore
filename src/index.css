@@ -1,0 +1,36 @@
+body {
+    font: 16px "Century Gothic", Futura, sans-serif;
+    margin: 40px;
+}
+
+ol, ul {
+    padding-left: 20px;
+}
+
+.menu-header {
+    margin-bottom: 20px;
+}
+
+.item {
+    background: #fff;
+    border: 1px solid #999;
+    float: left;
+    font-size: 14px;
+    line-height: normal;
+    height: 40px;
+    text-align: left;
+    padding: 5px;
+    width: 400px;
+}
+
+.menu {
+    background: #ddd;
+    border: 1px solid #999;
+    float: left;
+    font-size: 14px;
+    line-height: normal;
+    height: 400px;
+    padding: 0;
+    text-align: center;
+    width: 400px;
+}
