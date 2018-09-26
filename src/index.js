@@ -2,6 +2,10 @@ import React from 'react';
 import ReactDom from 'react-dom';
 import './index.css';
 
+
+/*
+This Item represents one of the items for sale
+*/
 class Item extends React.Component {
     render() {
         return (
@@ -15,25 +19,33 @@ class Item extends React.Component {
     }
 }
 
+
+/*
+The CartItem class represents an item that is added to the cart, with a quantity
+and a name attached
+*/
 class CartItem extends React.Component {
     render() {
         return (
             <button
                 className="cart-item"
                 onClick={this.props.onClick}>
-                {this.props.value + ': ' + this.props.quantity}
+                {this.props.value + ', Quantity: ' + this.props.quantity}
             </button>
         )
     }
 }
 
-
-
+/*
+The ShoppingList class contains all of the items that are for sale or in the
+cart.
+*/
 class ShoppingList extends React.Component {
     constructor(props){
         super(props);
         this.state = {
             priceTotal: 0,
+            quantityTotal: 0,
             cart: {
                 'Star Wars Episode IV: DVD' : null,
                 'Star Wars Episode V: DVD' : null,
@@ -63,18 +75,29 @@ class ShoppingList extends React.Component {
     }
 
     handleRemoveClick(name, price){
-        this.state.cart.splice(0, 1);
+        this.state.allItems[name] -= 1;
+        if (this.state.allItems[name] == 0) {
+            this.state.cart[name] = null;
+        } else {
+            this.state.cart[name] = <CartItem
+                value={name}
+                quantity={this.state.allItems[name]}
+                onClick={() => this.handleRemoveClick(name, price)}
+            />
+        }
         this.setState({
             priceTotal: this.state.priceTotal - price,
+            quantityTotal: this.state.quantityTotal - 1,
             cart: this.state.cart,
+            allItems: this.state.allItems,
         })
     }
 
     handleClick(name, price) {
         this.addCart(name, price);
         this.setState({
-            priceTotal: this.state.priceTotal+price,
-            cart: this.state.cart,
+            priceTotal: this.state.priceTotal + price,
+            quantityTotal: this.state.quantityTotal + 1,
         })
     }
 
@@ -102,12 +125,13 @@ class ShoppingList extends React.Component {
     }
 
     render() {
-        let menuHeader;
-        menuHeader = "The Pirate Shop";
+        var menuHeader = "The Pirate Shop";
+        var shopHeader = "Items For Sale"
         return (
             <div>
                 <div className="menu-header">{menuHeader}</div>
                 <div className="shopping-list">
+                    <div className="shop-header">{shopHeader}</div>
                     {this.renderItem('Star Wars Episode IV: DVD', 20)}
                     {this.renderItem('Star Wars Episode V: DVD', 20)}
                     {this.renderItem('Star Wars Episode VI: DVD', 20)}
@@ -116,7 +140,9 @@ class ShoppingList extends React.Component {
                     {this.renderItem('Star Wars Episode VI: Blu-Ray', 25)}
                 </div>
                 <div className="shopping-cart">
-                    {'$' + this.state.priceTotal}
+                    <div className="cart-header">
+                        {'Total Items: ' + this.state.quantityTotal + ' | Total in Cart: $' + this.state.priceTotal}
+                    </div>
                     <div>{this.renderCart()}</div>
                 </div>
             </div>
