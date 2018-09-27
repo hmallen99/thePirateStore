@@ -36,6 +36,32 @@ class CartItem extends React.Component {
     }
 }
 
+class RemoveButton extends React.Component {
+    render() {
+        return (
+            <button
+                className="remove-button"
+                onClick={this.props.onClick}>
+                {"X"}
+            </button>
+        )
+    }
+}
+
+class EnterQuantity extends React.Component {
+    render() {
+        return (
+            <form className='enter-quantity' onSubmit={this.props.onSubmit}>
+                <label>
+                    {"Quantity: "}
+                    <input type="text" size="10" onChange={this.props.onChange}/>
+                </label>
+
+            </form>
+        )
+    }
+}
+
 /*
 The ShoppingList class contains all of the items that are for sale or in the
 cart.
@@ -44,6 +70,7 @@ class ShoppingList extends React.Component {
     constructor(props){
         super(props);
         this.state = {
+            newQuant: 0,
             priceTotal: 0,
             quantityTotal: 0,
             cart: {
@@ -67,11 +94,23 @@ class ShoppingList extends React.Component {
 
     addCart(name, price){
         this.state.allItems[name] += 1;
-        this.state.cart[name] = <CartItem
-            value={name}
-            quantity={this.state.allItems[name]}
-            onClick={() => this.handleRemoveClick(name, price)}
-        />
+        this.state.cart[name] =
+        <div>
+            <CartItem
+                value={name}
+                quantity={this.state.allItems[name]}
+                onClick={() => this.handleRemoveClick(name, price)}
+            />
+            <RemoveButton
+                value={name}
+                onClick={() => this.handleRemoveAllClick(name, price)}
+            />
+            <EnterQuantity
+                onSubmit={(event) => this.handleSubmit(event, name, price)}
+                onChange={(event) => this.handleChange(event)}
+            />
+
+        </div>
     }
 
     handleRemoveClick(name, price){
@@ -79,11 +118,22 @@ class ShoppingList extends React.Component {
         if (this.state.allItems[name] == 0) {
             this.state.cart[name] = null;
         } else {
-            this.state.cart[name] = <CartItem
-                value={name}
-                quantity={this.state.allItems[name]}
-                onClick={() => this.handleRemoveClick(name, price)}
-            />
+            this.state.cart[name] =
+                <div>
+                    <CartItem
+                        value={name}
+                        quantity={this.state.allItems[name]}
+                        onClick={() => this.handleRemoveClick(name, price)}
+                    />
+                    <RemoveButton
+                        value={name}
+                        onClick={() => this.handleRemoveAllClick(name, price)}
+                    />
+                    <EnterQuantity
+                        onSubmit={(event) => this.handleSubmit(event, name, price)}
+                        onChange={(event) => this.handleChange(event)}
+                    />
+                </div>
         }
         this.setState({
             priceTotal: this.state.priceTotal - price,
@@ -91,6 +141,55 @@ class ShoppingList extends React.Component {
             cart: this.state.cart,
             allItems: this.state.allItems,
         })
+    }
+
+    handleRemoveAllClick(name, price) {
+        var numItems = this.state.allItems[name];
+        this.state.allItems[name] -= numItems;
+        this.state.cart[name] = null;
+        this.setState({
+            priceTotal: this.state.priceTotal - numItems * price,
+            quantityTotal: this.state.quantityTotal - numItems,
+            cart: this.state.cart,
+            allItems: this.state.allItems,
+        })
+    }
+
+    handleSubmit(event, name, price) {
+        event.preventDefault();
+        if(this.state.newQuant) {
+            var oldVal = this.state.allItems[name];
+            this.state.allItems[name] = this.state.newQuant;
+            this.state.cart[name] =
+            <div>
+                <CartItem
+                    value={name}
+                    quantity={this.state.allItems[name]}
+                    onClick={() => this.handleRemoveClick(name, price)}
+                />
+                <RemoveButton
+                    value={name}
+                    onClick={() => this.handleRemoveAllClick(name, price)}
+                />
+                <EnterQuantity
+                    onSubmit={(event) => this.handleSubmit(event, name, price)}
+                    onChange={(event) => this.handleChange(event)}
+                />
+            </div>;
+            this.setState({
+                newQuant: 0,
+                allItems: this.state.allItems,
+                priceTotal: this.state.priceTotal - oldVal * price + this.state.newQuant * price,
+                cart: this.state.cart,
+                quantityTotal: this.state.quantityTotal - oldVal + this.state.newQuant,
+            })
+        } else {
+            this.handleRemoveAllClick(name, price);
+        }
+    }
+
+    handleChange(event) {
+        this.setState({newQuant: parseInt(event.target.value, 10)})
     }
 
     handleClick(name, price) {
